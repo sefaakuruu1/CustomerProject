@@ -12,7 +12,12 @@ namespace ConsoleUI
         {
             //Product();
             //Order();
-            ProductGetDetails();
+            //ProductGetDetails();
+            ProductManager productManager = new ProductManager( new EfProductDal());
+            foreach (var item in productManager.GetAll().Data)
+            {
+                Console.WriteLine(item);
+            }
 
         }
 

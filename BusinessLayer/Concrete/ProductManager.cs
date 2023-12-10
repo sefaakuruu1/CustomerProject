@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Abstract;
+using Core.Utilities;
 using DataAccessLayer.Abstract;
 using Entities.Concrete;
 using Entities.DTOs;
@@ -24,9 +25,13 @@ namespace BusinessLayer.Concrete
             _productDal.Add(urun);
         }
 
-        public List<Urun> GetAll()
+        public IDataResult<List<Urun>> GetAll()
         {
-           return _productDal.GetAll();
+            if (DateTime.Now.Hour == 3)
+            {
+                return new ErrorDataResult<List<Urun>>(_productDal.GetAll(),Messages.MaintenanceTime);
+            }
+            return new SuccessDataResult<List<Urun>>(_productDal.GetAll(),Messages.ProductListed);
         }
 
         public List<Urun> GetByCategoryId(int KategoriId)
@@ -42,6 +47,23 @@ namespace BusinessLayer.Concrete
         public void Update(Urun urun)
         {
             _productDal.Update(urun);
+        }
+
+        IResult IProductService.Add(Urun urun)
+        {
+            _productDal.Add(urun);
+            return new Result(Messages.ProductAdded,true);
+        }
+
+        IResult IProductService.Update(Urun urun)
+        {
+            _productDal.Update(urun);
+            if (urun.UrunAdi.Length > 4)
+            {
+                return new ErrorResult(Messages.ProductAddedError);
+            }
+            
+            return new SuccessResult(Messages.ProductAdded);
         }
     }
 }
